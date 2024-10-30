@@ -12,7 +12,7 @@ export default function Home() {
     <>
       <Head>
         <title>My Landing Page</title>
-        <meta name="description" content="A simple landing page built with Next.js and shadcn." />
+        <meta name="description" content="Corgi App" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -20,7 +20,7 @@ export default function Home() {
       <main className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
       <Card className="items-center">
         <CardHeader className="text-4xl font-bold mb-4 flex justify-center items-center">
-         Corgi Landing Page 
+         Corgi Gallery Landing Page
             <Image
               src="/images/corgi.png" 
               alt="Hero Image"

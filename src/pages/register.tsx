@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import {useState } from "react";
 
 import {
   CardTitle,
@@ -15,9 +16,36 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
 export default function Register() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordConfirmation, setPasswordConfirmation] = useState("");
+
+  const handleRegistration = async(e: Event) => {
+    e.preventDefault(); //prevents refresh of page, might change to redirect to login page
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST', 
+        headers: {
+          'Content-Type' : 'application/json', 
+        },
+        body: JSON.stringify({
+          username, 
+          email, 
+          password, 
+          passwordConfirmation
+        })
+      })
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <div className="w-1/2 mx-auto max-w-md">
-      <form>
+      <form onSubmit={handleRegistration}>
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold">Register</CardTitle>
@@ -33,6 +61,9 @@ export default function Register() {
                 name="identifier"
                 type="text"
                 placeholder="john123"
+                onChange = {(e) => setUsername(e.target.value)}
+                required
+                
               />
             </div>
             <div className="space-y-2">
@@ -42,6 +73,8 @@ export default function Register() {
                 name="identifier"
                 type="text"
                 placeholder="johndoe@gmail.com"
+                onChange= {(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -51,6 +84,8 @@ export default function Register() {
                 name="password"
                 type="password"
                 placeholder="Enter your password"
+                onChange = {(e) => setPassword(e.target.value)}
+                required
               />
             </div>
             <div className="space-y-2">
@@ -60,6 +95,8 @@ export default function Register() {
                 name="password-confirmation"
                 type="password"
                 placeholder="Confirm your password"
+                onChange = {(e) => setPasswordConfirmation(e.target.value)}
+                required
               />
             </div>
           </CardContent>
