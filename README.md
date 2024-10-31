@@ -10,5 +10,11 @@ To Run Postgres DB on Docker
 ```
 docker-compose up -d
 docker ps
-docker exec -it [container-id] psql -U admin -d use
+docker exec -it [container-id] psql -U admin -d user
 ```
+
+Libraries/Frameworks I mostly used (besides the ones required):
+- bcryptjs
+- shadcn 
+- jsonwebtoken
+- node-postgres

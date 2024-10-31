@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import { query } from "../../lib/db";
 
 type Data = {
-  name: string;
+  message: string;
 };
 
 function checkFields(
@@ -42,7 +42,7 @@ export default async function handler(
   }
   const { username, email, password, passwordConfirmation } = req.body;
   if (password !== passwordConfirmation) {
-    res.status(400).json({ name: "Passwords do not match" });
+    res.status(400).json({ message: "Passwords do not match" });
     return;
   }
 
@@ -64,9 +64,9 @@ export default async function handler(
       `INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`,
       [username, email, hashedPassword]
     );
-    res.status(200).json({ name: "Registration Successful!" });
+    res.status(200).json({ message: "Registration Successful!" });
   } catch {
-    res.status(400).json({ name: "Registration Failed: Duplicate User Found" });
+    res.status(400).json({ message: "Registration Failed: Duplicate User Found" });
   }
 
 }

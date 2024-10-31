@@ -1,26 +1,51 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import {query} from "../../lib/db";
+import { query } from "../../lib/db";
 import bcrypt from "bcryptjs";
-
+import jwt from "jsonwebtoken";
 
 type Data = {
-  name: string;
+  message: string;
+  token: string | null;
 };
 
-export default function handler(
+const SECRET_KEY = process.env.JWT_SECRET;
+
+export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Data>,
+  res: NextApiResponse<Data>
 ) {
-    if (req.method !== "POST") {
-        res.setHeader("Allow", ["POST"]);
-        res.status(405).end(`Method ${req.method} Not Allowed`);
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    res.status(405).end(`Method ${req.method} Not Allowed`);
+  }
+  const { username, password } = req.body;
+  const salt = bcrypt.genSaltSync(7);
+  const hashedPassword = bcrypt.hashSync(password, salt);
+
+
+  try {
+    const result = await query(
+      `SELECT * FROM users WHERE username = $1;`,
+      [username]
+    );
+  
+    if (result.rows.length === 0 || !(await bcrypt.compare(password, result.rows[0].password))) {
+      return res.status(400).json({ message: "Invalid username or password", token: null });
     }
-    const { username, password} = req.body;
-    const salt = bcrypt.genSaltSync(7);
-    const hashedPassword = bcrypt.hashSync(password, salt); 
-    const result =  query(`SELECT * FROM users WHERE username = ? AND password = ?`, [username, hashedPassword]);
-    res.status(200).json({ name: "John Doe" });
+  
+  } catch (error) {
+    console.error("Database query error:", error);
+    res.status(500).json({ token : null, message: "Internal server error" });
+  }
 
+  const payload = {
+    username: username,
+    password: hashedPassword,
+  };
 
+  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    expiresIn: "5m",
+  });
+  return res.status(200).json({ message: "Login successful!", token: token });
 }

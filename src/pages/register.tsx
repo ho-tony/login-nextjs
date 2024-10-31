@@ -21,7 +21,7 @@ export default function Register() {
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
 
-  const handleRegistration = async(e: Event) => {
+  const handleRegistration = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //prevents refresh of page, might change to redirect to login page
     try {
       const response = await fetch('/api/register', {
