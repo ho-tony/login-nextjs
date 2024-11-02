@@ -9,7 +9,7 @@ type Data = {
   token: string | null;
 };
 
-const SECRET_KEY = process.env.JWT_SECRET;
+const SECRET_KEY: string = process.env.JWT_SECRET ?? '';
 
 export default async function handler(
   req: NextApiRequest,
@@ -44,7 +44,7 @@ export default async function handler(
     password: hashedPassword,
   };
 
-  const token = jwt.sign(payload, process.env.JWT_SECRET, {
+  const token = jwt.sign(payload, SECRET_KEY, {
     expiresIn: "5m",
   });
   return res.status(200).json({ message: "Login successful!", token: token });

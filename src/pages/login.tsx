@@ -44,15 +44,6 @@ export default function Login() {
     } catch (error: any) {
       toast.error("Network error");
     }
-
-    //
-
-    //       const data = await response.json();
-    //       console.log("Login successful:", data);
-    //     } catch (error) {
-    //       console.error("Network error during login:", error);
-    //       toast.error("Network error. Please check your connection and try again.");
-    //     }
   };
 
   return (
