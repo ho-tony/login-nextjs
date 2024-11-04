@@ -17,6 +17,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import cookie from "cookie";
 import { verifyToken } from "../lib/jwt";
+import Logo from "@/components/ui/logo";
 
 export async function getServerSideProps(context) {
   const { req } = context;
@@ -156,6 +157,7 @@ export default function Profile({ user, ip }) {
 
   return (
     <div className="w-1/2 mx-auto max-w-md">
+      <Logo/>
       <Card>
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold">Profile</CardTitle>

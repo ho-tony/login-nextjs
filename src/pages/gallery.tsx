@@ -1,14 +1,20 @@
-import {useEffect } from 'react';
+import { useEffect } from 'react';
 import cookie from 'cookie';
-import {useRouter} from 'next/router';
-import {verifyToken} from '../lib/jwt';
+import { useRouter } from 'next/router';
+import { verifyToken } from '../lib/jwt';
+import Image from 'next/image';
+import Logo from '@/components/ui/logo';
 
 export default function Gallery() {
+
   const router = useRouter();
 
   return (
     <div>
-      <h1>Gallery Page where it will be protected</h1>
+      <Logo/>
+      <Image src="/images/corgi_gallery.jpg" height={1280} width={720} alt="Corgi picture">
+      </Image>
+
     </div>
   );
 }
