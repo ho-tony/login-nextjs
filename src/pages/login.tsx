@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import {useRouter} from "next/router";
-import { toast, ToastContainer } from "react-toastify";
+import { toast} from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import {
@@ -22,7 +21,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const router = useRouter();
 
-  const handleLogin = async (e: any) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // prevents page refresh
     try {
       const response = await fetch("/api/login", {
@@ -46,7 +45,8 @@ export default function Login() {
       router.push('/gallery')
 
       //todo add jwt tokens
-    } catch (error: any) {
+    } catch (error: unknown) {
+      console.log(error);
       toast.error("Failed to login");
     }
   };

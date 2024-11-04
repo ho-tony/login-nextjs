@@ -1,13 +1,11 @@
-import { useEffect } from 'react';
-import cookie from 'cookie';
-import { useRouter } from 'next/router';
+// import cookie from 'cookie';
+import {parse} from 'cookie';
 import { verifyToken } from '../lib/jwt';
 import Image from 'next/image';
 import Logo from '@/components/ui/logo';
 
 export default function Gallery() {
 
-  const router = useRouter();
 
   return (
     <div>
@@ -18,9 +16,11 @@ export default function Gallery() {
     </div>
   );
 }
-export async function getServerSideProps(context: { req: any; }) {
+import { GetServerSidePropsContext } from 'next';
+
+export async function getServerSideProps(context: GetServerSidePropsContext) {
   const { req } = context;
-  const cookiesParsed = cookie.parse(req.headers.cookie || '');
+  const cookiesParsed = parse(req.headers.cookie || '');
   const token = cookiesParsed.token || null;
 
   if (!token) {

@@ -1,7 +1,3 @@
-// Remove "use client" if you're using getServerSideProps in the same file.
-// "use client" is used for client-side components, whereas getServerSideProps is for server-side.
-// If you need client-side interactivity, consider structuring your component to separate server and client logic.
-
 import { useEffect, useState } from "react";
 import {
   CardTitle,
@@ -15,14 +11,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import cookie from "cookie";
+// import cookie from "cookie";
+import {parse} from "cookie";
 import { verifyToken } from "../lib/jwt";
 import Logo from "@/components/ui/logo";
-import {useRouter } from "next/router";
+import { useRouter } from "next/router";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { IncomingMessage } from "http";
 
-export async function getServerSideProps(context) {
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const { req } = context;
-  const cookiesParsed = cookie.parse(req.headers.cookie || "");
+  const cookiesParsed = parse(req.headers.cookie || "");
   const token = cookiesParsed.token || null;
 
   if (!token) {
@@ -34,7 +35,7 @@ export async function getServerSideProps(context) {
     };
   }
 
-  const decoded = verifyToken(token);
+  const decoded = verifyToken(token) as User | null;
 
   if (!decoded) {
     return {
@@ -45,33 +46,45 @@ export async function getServerSideProps(context) {
     };
   }
 
-  const getClientIp = (req) => {
+  const getClientIp = (req: IncomingMessage): string | undefined => {
     const xForwardedFor = req.headers["x-forwarded-for"];
-    if (xForwardedFor) {
-      const ips = xForwardedFor.split(",").map((ip) => ip.trim());
+    if (typeof xForwardedFor === "string") {
+      const ips = xForwardedFor.split(",").map((ip: string) => ip.trim());
       return ips[0];
     }
-    return req.connection.remoteAddress;
+    return req.socket.remoteAddress || undefined;
   };
 
-  const clientIp = getClientIp(req);
+  const clientIp = getClientIp(req) || "Unknown";
 
   return {
     props: { user: decoded, ip: clientIp },
   };
+};
+
+interface User {
+  username: string;
+  email: string;
 }
 
-export default function Profile({ user, ip }) {
-  // Initialize profileData with server-side data
-  const [profileData, setProfileData] = useState({
+interface ProfileProps {
+  user: User;
+  ip: string;
+}
+
+export default function Profile({ user, ip }: ProfileProps) {
+  const [profileData, setProfileData] = useState<{
+    username: string;
+    email: string;
+    location: string;
+  }>({
     username: user.username || "",
     email: user.email || "",
     location: ip || "Loading location...",
   });
-  const router =  useRouter();
+  const router = useRouter();
 
   useEffect(() => {
-    // Define an async function inside useEffect
     const fetchProfile = async () => {
       try {
         const response = await fetch("/api/getProfileInfo", {
@@ -86,13 +99,13 @@ export default function Profile({ user, ip }) {
           return;
         }
 
-        const data = await response.json();
+        const data: Partial<User & { location: string }> = await response.json();
 
-        setProfileData({
-          username: data.username || profileData.username,
-          email: data.email || profileData.email,
-          location: data.location || profileData.location,
-        });
+        setProfileData((prev) => ({
+          username: data.username || prev.username,
+          email: data.email || prev.email,
+          location: data.location || prev.location,
+        }));
       } catch (error) {
         console.error("Error fetching profile info:", error);
         toast.error("Failed to load profile information.");
@@ -100,18 +113,15 @@ export default function Profile({ user, ip }) {
     };
 
     fetchProfile();
-    // Empty dependency array to run only once on mount
   }, []);
 
-  // Handler for email change if needed
-  const handleEmailChange = (e) => {
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setProfileData((prev) => ({
       ...prev,
       email: e.target.value,
     }));
   };
 
-  // Handler for updating profile
   const handleUpdateProfile = async () => {
     try {
       const response = await fetch("/api/updateProfile", {
@@ -128,7 +138,7 @@ export default function Profile({ user, ip }) {
         throw new Error("Failed to update profile.");
       }
 
-      const result = await response.json();
+      await response.json();
       toast.success("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -146,7 +156,7 @@ export default function Profile({ user, ip }) {
         throw new Error("Failed to logout.");
       }
       toast.success("Logged out successfully!");
-      router.replace('/login');
+      router.replace("/login");
     } catch (error) {
       console.error("Error during logout:", error);
       toast.error("Failed to logout.");
@@ -155,7 +165,7 @@ export default function Profile({ user, ip }) {
 
   return (
     <div className="w-1/2 mx-auto max-w-md">
-      <Logo/>
+      <Logo />
       <Card>
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold">Profile</CardTitle>

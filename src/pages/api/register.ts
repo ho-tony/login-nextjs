@@ -7,27 +7,6 @@ type Data = {
   message: string;
 };
 
-function checkFields(
-  username: String,
-  email: String,
-  password: String,
-  passwordConfirmation: String
-): boolean {
-  if (
-    username === "" ||
-    email === "" ||
-    password === "" ||
-    passwordConfirmation === ""
-  ) {
-    return false;
-  }
-  if (password !== passwordConfirmation) {
-    return false;
-  }
-
-
-  return true;
-}
 
 export default async function handler(
   req: NextApiRequest,
@@ -57,7 +36,7 @@ export default async function handler(
       `);
   //insert into is good practice to prevent sql injection
   try {
-    const query_result = await query(
+    await query(
       `INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`,
       [username, email, hashedPassword]
     );

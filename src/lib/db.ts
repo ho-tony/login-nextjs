@@ -4,7 +4,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 });
 
-export const query = async (text: string, params: any[] = []) => {
+export const query = async (text: string, params: (string | number)[] = []) => {
   try {
     const res = await pool.query(text, params);
     return res;

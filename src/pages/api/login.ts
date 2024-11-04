@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { query } from "../../lib/db";
-import cookie from 'cookie';
+import {serialize} from 'cookie';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 type Data = {
@@ -49,7 +49,7 @@ export default async function handler(
   });
 
   
-  res.setHeader('Set-Cookie', cookie.serialize('token', token, {
+  res.setHeader('Set-Cookie', serialize('token', token, {
     httpOnly: true,
     maxAge: 300, 
     sameSite: 'strict',

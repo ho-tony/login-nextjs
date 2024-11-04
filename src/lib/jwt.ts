@@ -16,6 +16,7 @@ export const verifyToken = (token : string) : TokenPayload | null => {
     const decoded = jwt.verify(token, SECRET_KEY) as TokenPayload;
     return decoded;
   } catch (error) {
+    console.log(error);
     return null;
   }
 };
