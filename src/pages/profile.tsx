@@ -18,6 +18,7 @@ import "react-toastify/dist/ReactToastify.css";
 import cookie from "cookie";
 import { verifyToken } from "../lib/jwt";
 import Logo from "@/components/ui/logo";
+import {useRouter } from "next/router";
 
 export async function getServerSideProps(context) {
   const { req } = context;
@@ -67,6 +68,7 @@ export default function Profile({ user, ip }) {
     email: user.email || "",
     location: ip || "Loading location...",
   });
+  const router =  useRouter();
 
   useEffect(() => {
     // Define an async function inside useEffect
@@ -119,7 +121,6 @@ export default function Profile({ user, ip }) {
         },
         body: JSON.stringify({
           email: profileData.email,
-          // Include other fields as necessary
         }),
       });
 
@@ -129,14 +130,12 @@ export default function Profile({ user, ip }) {
 
       const result = await response.json();
       toast.success("Profile updated successfully!");
-      // Update state or perform other actions as needed
     } catch (error) {
       console.error("Error updating profile:", error);
       toast.error("Failed to update profile.");
     }
   };
 
-  // Handler for logout
   const handleLogout = async () => {
     try {
       const response = await fetch("/api/logout", {
@@ -146,9 +145,8 @@ export default function Profile({ user, ip }) {
       if (!response.ok) {
         throw new Error("Failed to logout.");
       }
-
-      // Redirect to login or perform other actions
-      window.location.href = "/login";
+      toast.success("Logged out successfully!");
+      router.replace('/login');
     } catch (error) {
       console.error("Error during logout:", error);
       toast.error("Failed to logout.");
