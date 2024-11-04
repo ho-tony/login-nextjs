@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { query } from "../../lib/db";
+import cookie from 'cookie';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
 type Data = {
   message: string;
   token: string | null;
@@ -47,5 +47,14 @@ export default async function handler(
   const token = jwt.sign(payload, SECRET_KEY, {
     expiresIn: "5m",
   });
+
+  
+  res.setHeader('Set-Cookie', cookie.serialize('token', token, {
+    httpOnly: true,
+    maxAge: 300, 
+    sameSite: 'strict',
+    path: '/',
+  }));
+
   return res.status(200).json({ message: "Login successful!", token: token });
 }

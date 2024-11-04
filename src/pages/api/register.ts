@@ -25,13 +25,10 @@ function checkFields(
     return false;
   }
 
-  //todo verify username is unique
-  //todo verify email is unique
 
   return true;
 }
 
-//need to check for username uniqueness
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>

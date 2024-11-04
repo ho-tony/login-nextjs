@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import {useState } from "react";
+import {useRouter} from 'next/router';
 
 import {
   CardTitle,
@@ -20,6 +21,7 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirmation, setPasswordConfirmation] = useState("");
+  const router = useRouter();
 
   const handleRegistration = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); //prevents refresh of page, might change to redirect to login page
@@ -38,6 +40,7 @@ export default function Register() {
       })
       const data = await response.json();
       console.log(data);
+      router.push('/login');
     } catch (error) {
       console.log(error);
     }

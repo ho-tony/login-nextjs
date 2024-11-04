@@ -1,4 +1,6 @@
-"use client";
+// Remove "use client" if you're using getServerSideProps in the same file.
+// "use client" is used for client-side components, whereas getServerSideProps is for server-side.
+// If you need client-side interactivity, consider structuring your component to separate server and client logic.
 
 import { useEffect, useState } from "react";
 import {
@@ -13,29 +15,144 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import cookie from "cookie";
+import { verifyToken } from "../lib/jwt";
 
+export async function getServerSideProps(context) {
+  const { req } = context;
+  const cookiesParsed = cookie.parse(req.headers.cookie || "");
+  const token = cookiesParsed.token || null;
 
-export default function Profile() {
-    const [location, setLocation] = useState("Loading location...");
+  if (!token) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  const decoded = verifyToken(token);
+
+  if (!decoded) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  const getClientIp = (req) => {
+    const xForwardedFor = req.headers["x-forwarded-for"];
+    if (xForwardedFor) {
+      const ips = xForwardedFor.split(",").map((ip) => ip.trim());
+      return ips[0];
+    }
+    return req.connection.remoteAddress;
+  };
+
+  const clientIp = getClientIp(req);
+
+  return {
+    props: { user: decoded, ip: clientIp },
+  };
+}
+
+export default function Profile({ user, ip }) {
+  // Initialize profileData with server-side data
   const [profileData, setProfileData] = useState({
-    username: "john123",
-    email: "john.doe@example.com",
-    location: "Loading location...",
+    username: user.username || "",
+    email: user.email || "",
+    location: ip || "Loading location...",
   });
 
   useEffect(() => {
-    const fetchLocation = async () => {
+    // Define an async function inside useEffect
+    const fetchProfile = async () => {
       try {
-        const response = await fetch(`https://ipinfo.io/json?token=${process.env.IPINFO_TOKEN}`);
+        const response = await fetch("/api/getProfileInfo", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          console.log("Failed to fetch profile information.");
+          return;
+        }
+
         const data = await response.json();
-        setLocation(data);
+
+        setProfileData({
+          username: data.username || profileData.username,
+          email: data.email || profileData.email,
+          location: data.location || profileData.location,
+        });
       } catch (error) {
-        console.error('Error fetching location:', error);
+        console.error("Error fetching profile info:", error);
+        toast.error("Failed to load profile information.");
       }
     };
 
-    fetchLocation();
+    fetchProfile();
+    // Empty dependency array to run only once on mount
   }, []);
+
+  // Handler for email change if needed
+  const handleEmailChange = (e) => {
+    setProfileData((prev) => ({
+      ...prev,
+      email: e.target.value,
+    }));
+  };
+
+  // Handler for updating profile
+  const handleUpdateProfile = async () => {
+    try {
+      const response = await fetch("/api/updateProfile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: profileData.email,
+          // Include other fields as necessary
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile.");
+      }
+
+      const result = await response.json();
+      toast.success("Profile updated successfully!");
+      // Update state or perform other actions as needed
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      toast.error("Failed to update profile.");
+    }
+  };
+
+  // Handler for logout
+  const handleLogout = async () => {
+    try {
+      const response = await fetch("/api/logout", {
+        method: "POST",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to logout.");
+      }
+
+      // Redirect to login or perform other actions
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Error during logout:", error);
+      toast.error("Failed to logout.");
+    }
+  };
 
   return (
     <div className="w-1/2 mx-auto max-w-md">
@@ -50,6 +167,8 @@ export default function Profile() {
               id="username"
               name="username"
               type="text"
+              value={profileData.username}
+              disabled
               className="bg-gray-100"
             />
           </div>
@@ -59,7 +178,8 @@ export default function Profile() {
               id="email"
               name="email"
               type="email"
-              onChange={(e) => {}}
+              value={profileData.email}
+              onChange={handleEmailChange}
               className="bg-gray-100"
             />
           </div>
@@ -69,14 +189,17 @@ export default function Profile() {
               id="location"
               name="location"
               type="text"
+              value={profileData.location}
               disabled
               className="bg-gray-100"
             />
           </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button>Update Profile</Button>
-          <Button>Logout</Button>
+          <Button onClick={handleUpdateProfile}>Update Profile</Button>
+          <Button onClick={handleLogout} variant="secondary">
+            Logout
+          </Button>
         </CardFooter>
       </Card>
       <ToastContainer />

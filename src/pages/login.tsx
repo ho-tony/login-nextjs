@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import {useRouter} from "next/router";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -19,6 +20,7 @@ import { Input } from "@/components/ui/input";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (e: any) => {
     e.preventDefault(); // prevents page refresh
@@ -40,9 +42,12 @@ export default function Login() {
         toast.error(errorMessage);
         return;
       }
+      localStorage.setItem('username', username);
+      router.push('/gallery')
+
       //todo add jwt tokens
     } catch (error: any) {
-      toast.error("Network error");
+      toast.error("Failed to login");
     }
   };
 
