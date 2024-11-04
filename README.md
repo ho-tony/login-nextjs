@@ -18,3 +18,5 @@ Libraries/Frameworks I mostly used (besides the ones required):
 - shadcn 
 - jsonwebtoken
 - node-postgres
+
+Be sure to use a React Version <= 19 (react compiler can get finnicky) and node version that supports nextjs (I use node 21).
