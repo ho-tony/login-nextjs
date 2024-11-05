@@ -12,11 +12,39 @@ interface GalleryImage {
   description: string;
 }
 
-interface GalleryProps {
-  user: any; // Replace `any` with your user type
-}
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const { req } = context;
+  const cookiesParsed = parse(req.headers.cookie || '');
+  const token = cookiesParsed.token || null;
 
-const Gallery: React.FC<GalleryProps> = ({ user }) => {
+  if (!token) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  const decoded = verifyToken(token);
+
+  if (!decoded) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { user: decoded },
+  };
+};
+
+export default function Gallery() {
   const galleryImages: GalleryImage[] = [
     {
       id: 1,
@@ -72,38 +100,4 @@ const Gallery: React.FC<GalleryProps> = ({ user }) => {
       </div>
     </div>
   );
-};
-
-export default Gallery;
-
-export const getServerSideProps: GetServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const { req } = context;
-  const cookiesParsed = parse(req.headers.cookie || '');
-  const token = cookiesParsed.token || null;
-
-  if (!token) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-
-  const decoded = verifyToken(token);
-
-  if (!decoded) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { user: decoded },
-  };
 };

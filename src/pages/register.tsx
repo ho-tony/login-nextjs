@@ -12,9 +12,42 @@ import {
   Card,
 } from "@/components/ui/card";
 
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import {parse} from 'cookie';
+import {verifyToken} from '../lib/jwt'; 
+import {User} from '@/models/user';
 import Logo from "@/components/ui/logo";
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const { req } = context;
+  const cookiesParsed = parse(req.headers.cookie || "");
+  const token = cookiesParsed.token || null;
+
+  if (!token) {
+    return {
+      props: {}, 
+    };
+  }
+
+  const decoded = verifyToken(token) as User | null;
+  if (decoded) {
+    return {
+      redirect: {
+        destination: "/profile",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {}, 
+  };
+};
+
 
 export default function Register() {
   const [username, setUsername] = useState("");

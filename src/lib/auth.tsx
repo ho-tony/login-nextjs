@@ -1,7 +1,7 @@
 // utils/auth.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { verifyToken } from './jwt';
-import cookie from 'cookie';
+import {parse} from 'cookie';
 
 interface TokenPayload {
   id: number;
@@ -10,7 +10,7 @@ interface TokenPayload {
 }
 
 export const authenticate = (req: NextApiRequest, res: NextApiResponse): TokenPayload | null => {
-  const cookies = req.headers.cookie ? cookie.parse(req.headers.cookie) : {};
+  const cookies = req.headers.cookie ? parse(req.headers.cookie) : {};
   const token = cookies.token || null;
 
   if (!token) {
