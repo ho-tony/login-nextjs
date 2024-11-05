@@ -9,7 +9,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { parse } from "cookie";
 import { verifyToken } from "../lib/jwt";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
-
 import {
   CardTitle,
   CardHeader,
@@ -17,10 +16,13 @@ import {
   CardFooter,
   Card,
 } from "@/components/ui/card";
-
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { User } from "@/models/user";
+interface LoginResponse {
+  token?: string;
+  error?: string;
+}
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
@@ -51,6 +53,7 @@ export const getServerSideProps: GetServerSideProps = async (
   };
 };
 
+
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -59,7 +62,7 @@ export default function Login() {
   useErrorToast(router.query.error as string);
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // prevents page refresh
+    e.preventDefault();
     try {
       const response = await fetch("/api/login", {
         method: "POST",
@@ -71,15 +74,22 @@ export default function Login() {
           password,
         }),
       });
+
+      const data: LoginResponse = await response.json();
+
       if (!response.ok) {
         toast.error("Invalid Username or Password. Please try again.");
         return;
       }
-      localStorage.setItem("username", username);
-      router.replace("/profile");
+
+      if (data.token) {
+        router.replace("/profile");
+      } else {
+        toast.error("Login failed: No token received");
+      }
     } catch (error: unknown) {
       console.log(error);
-      toast.error("Failed to login");
+      toast.error("Failed to login. Internal Server Error");
     }
   };
 
@@ -87,7 +97,6 @@ export default function Login() {
     <div className="w-1/2 mx-auto max-w-md">
       <form onSubmit={handleLogin}>
         <Logo />
-
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold">Login</CardTitle>
