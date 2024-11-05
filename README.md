@@ -32,6 +32,7 @@ Be sure to use a React Version < 19 (react compiler can get finnicky) and node v
 
 
 ![Home Page Screenshot](/screenshots/homepage.png)
+![Gallery Screenshot](/screenshots/gallery.png)
 ![Login Page Screenshot](/screenshots/login.png)
 ![Profile Page Screenshot](/screenshots/profile-page.png)
 ![Registration Screenshot](/screenshots/registration.png)
