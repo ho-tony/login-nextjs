@@ -17,6 +17,8 @@ Libraries/Frameworks I mostly used (besides the ones required):
 - bcryptjs
 - shadcn 
 - jsonwebtoken
-- node-postgres
+- node-postgres 
+- cookies
+- vitest (because jest had a lot of dependency conflicts with react version 18)
 
 Be sure to use a React Version < 19 (react compiler can get finnicky) and node version that supports nextjs (I use node 21).

@@ -1,5 +1,3 @@
-// pages/index.js
-
 import Head from "next/head";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardFooter } from "@/components/ui/card";
