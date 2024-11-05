@@ -11,13 +11,15 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import cookie from "cookie";
 import { parse } from "cookie";
 import { verifyToken } from "../lib/jwt";
 import Logo from "@/components/ui/logo";
 import { useRouter } from "next/router";
 import { GetServerSideProps, GetServerSidePropsContext } from "next";
 import { IncomingMessage } from "http";
+import { User } from "@/models/user";
+import { ProfileProps } from "@/models/profileprops";
+
 
 export const getServerSideProps: GetServerSideProps = async (
   context: GetServerSidePropsContext
@@ -61,16 +63,6 @@ export const getServerSideProps: GetServerSideProps = async (
     props: { user: decoded, ip: clientIp },
   };
 };
-
-interface User {
-  username: string;
-  email: string;
-}
-
-interface ProfileProps {
-  user: User;
-  ip: string;
-}
 
 export default function Profile({ user, ip }: ProfileProps) {
   const [profileData, setProfileData] = useState<{

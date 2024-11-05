@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import { toast } from "react-toastify";
-import {ToastContainer} from 'react-toastify';
 import useErrorToast from "@/hooks/useErrorToast";
 import Logo from "@/components/ui/logo";
 import "react-toastify/dist/ReactToastify.css";
+import { parse } from "cookie";
+import { verifyToken } from "../lib/jwt";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
 
 import {
   CardTitle,
@@ -18,6 +20,36 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { User } from "@/models/user";
+
+export const getServerSideProps: GetServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const { req } = context;
+  const cookiesParsed = parse(req.headers.cookie || "");
+  const token = cookiesParsed.token || null;
+
+  if (!token) {
+    return {
+      props: {}, 
+    };
+  }
+
+  const decoded = verifyToken(token) as User | null;
+
+  if (decoded) {
+    return {
+      redirect: {
+        destination: "/profile",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {}, 
+  };
+};
 
 export default function Login() {
   const [username, setUsername] = useState("");
@@ -55,6 +87,7 @@ export default function Login() {
     <div className="w-1/2 mx-auto max-w-md">
       <form onSubmit={handleLogin}>
         <Logo />
+
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold">Login</CardTitle>
