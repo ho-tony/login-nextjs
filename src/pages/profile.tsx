@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // import cookie from "cookie";
-import {parse} from "cookie";
+import { parse } from "cookie";
 import { verifyToken } from "../lib/jwt";
 import Logo from "@/components/ui/logo";
 import { useRouter } from "next/router";
@@ -29,7 +29,7 @@ export const getServerSideProps: GetServerSideProps = async (
   if (!token) {
     return {
       redirect: {
-        destination: "/login",
+        destination: "/login?error=not_authenticated",
         permanent: false,
       },
     };
@@ -99,7 +99,8 @@ export default function Profile({ user, ip }: ProfileProps) {
           return;
         }
 
-        const data: Partial<User & { location: string }> = await response.json();
+        const data: Partial<User & { location: string }> =
+          await response.json();
 
         setProfileData((prev) => ({
           username: data.username || prev.username,
@@ -130,6 +131,7 @@ export default function Profile({ user, ip }: ProfileProps) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          username: profileData.username,
           email: profileData.email,
         }),
       });

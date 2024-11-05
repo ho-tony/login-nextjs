@@ -15,7 +15,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     }
     const authUser = authenticate(req, res);
     if (!authUser) {
-        return;
+        return res.status(400);
     }
     const queryResult = await query("SELECT * from users where (username = $1)", [authUser.username]);
     const user = queryResult.rows[0];

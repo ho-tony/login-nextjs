@@ -14,6 +14,7 @@ import {
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import Logo from "@/components/ui/logo";
 
 export default function Register() {
   const [username, setUsername] = useState("");
@@ -48,6 +49,7 @@ export default function Register() {
   return (
     <div className="w-1/2 mx-auto max-w-md">
       <form onSubmit={handleRegistration}>
+        <Logo/>
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold">Register</CardTitle>

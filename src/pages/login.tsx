@@ -3,7 +3,11 @@
 import { useState } from "react";
 import {useRouter} from "next/router";
 import { toast} from "react-toastify";
+import useErrorToast from "@/hooks/useErrorToast";
+import Logo from "@/components/ui/logo";
+
 import "react-toastify/dist/ReactToastify.css";
+
 
 import {
   CardTitle,
@@ -19,7 +23,11 @@ import { Input } from "@/components/ui/input";
 export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+
   const router = useRouter();
+  
+
+  useErrorToast(router.query.error as string ); 
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // prevents page refresh
@@ -42,9 +50,8 @@ export default function Login() {
         return;
       }
       localStorage.setItem('username', username);
-      router.push('/gallery')
+      router.push('/profile')
 
-      //todo add jwt tokens
     } catch (error: unknown) {
       console.log(error);
       toast.error("Failed to login");
@@ -53,7 +60,9 @@ export default function Login() {
 
   return (
     <div className="w-1/2 mx-auto max-w-md">
+      
       <form onSubmit={handleLogin}>
+        <Logo/>
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-3xl font-bold">Login</CardTitle>
