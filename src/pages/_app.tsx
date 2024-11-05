@@ -1,8 +1,8 @@
 import "@/styles/globals.css";
-// import { Sidebar } from "lucide-react";
 import type { AppProps } from "next/app";
 import { Inter } from "next/font/google";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; 
 
 const inter = Inter({ subsets: ["latin"] });
 
